@@ -63,7 +63,7 @@ bash | zsh )
   ;;
 esac
 
-commands=(`jtools commands --sh`)
+commands=$(jtools commands --sh)
 IFS="|"
 cat <<EOS
 _jtools_wrapper() {
