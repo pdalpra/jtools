@@ -5,15 +5,22 @@ set -e
 # Provide jtools completions
 if [ "$1" = "--complete" ]; then
 	echo install
+	echo update
 	echo remove
 fi
 
 base_install_path=${JTOOLS_INSTALL_PATH:=~/.bin}
 full_install_path=$base_install_path/_sbt
 symlink_to_parent=${JTOOLS_SYMLINK_TO_PARENT:=true}
+jtools_folder=~/.jtools
+sbt_current_sha_file="$jtools_folder/sbt_current_sha"
 
 install_sbt() {
 	echo "Installing SBT..."
+
+	if [ ! -d $jtools_folder ]; then
+		mkdir -p "$jtools_folder"
+	fi
 
 	if [ -e $full_install_path ]; then
 		echo "SBT already installed or install folder $full_install_path already exists, exiting."
@@ -22,11 +29,34 @@ install_sbt() {
 
 	git clone git@github.com:paulp/sbt-extras $full_install_path 2>/dev/null
 
+	update_current_sha_file
+
 	echo "SBT successfully installed to $full_install_path"
 	if [ "$symlink_to_parent" = "true" ]; then
 		echo "Symlinking $full_install_path/sbt to $base_install_path/sbt..."
 		ln -s $full_install_path/sbt $base_install_path/sbt
 	fi
+}
+
+update_sbt() {
+	echo "Upgrading SBT..."
+	
+	git -C $full_install_path pull 1>/dev/null
+
+	last_sha=$(cat $sbt_current_sha_file)
+
+	last_commits=$(git -C $full_install_path --no-pager log --oneline $last_sha..HEAD)
+	if [ "$last_commits" == "" ]; then
+		message="None"
+	else
+		message=$(echo -e "\n$last_commits")
+	fi
+
+	echo "commits since last update: $message"
+
+	update_current_sha_file
+
+	echo -e "\nSBT successfully updated."
 }
 
 remove_sbt() {
@@ -52,10 +82,16 @@ yes_or_no() {
 	esac
 }
 
+update_current_sha_file() {
+	git -C $full_install_path rev-parse HEAD > $sbt_current_sha_file
+}
+
 case "$1" in
 	install) 
 		install_sbt;;
 	remove)
 		remove_sbt;;
+	update)
+		update_sbt;;
 esac
 
