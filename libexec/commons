@@ -1,0 +1,31 @@
+#!/usr/bin/env bash
+
+set -e
+
+JTOOLS_FOLDER=${JTOOLS_FOLDER:=$HOME/.jtools}
+JTOOLS_PATHS_FOLDER="$JTOOLS_FOLDER/paths"
+
+create_jtools_folders_if_necessary() {
+	if [ ! -d $JTOOLS_PATHS_FOLDER ]; then
+		mkdir -p "$JTOOLS_PATHS_FOLDER"
+	fi
+}
+
+yes_or_no() {
+	read -p "$1" choice
+	case "$choice" in
+		y|Y) echo "yes";;
+	  *) echo "no";;
+	esac
+}
+
+create_path_file() {
+	program_name="$1"
+	path="$2"
+	echo "$path" > "$JTOOLS_PATHS_FOLDER/$program_name"
+}
+
+remove_path_file() {
+	program_name="$1"
+	rm -f "$JTOOLS_PATHS_FOLDER/$program_name"
+}

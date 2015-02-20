@@ -9,43 +9,38 @@ if [ "$1" = "--complete" ]; then
 	echo remove
 fi
 
-base_install_path=${JTOOLS_INSTALL_PATH:=~/.bin}
-full_install_path=$base_install_path/_sbt
-symlink_to_parent=${JTOOLS_SYMLINK_TO_PARENT:=true}
-jtools_folder=~/.jtools
-sbt_current_sha_file="$jtools_folder/sbt_current_sha"
+. $_JTOOLS_ROOT/libexec/commons
+
+SBT_INSTALL_PATH=$JTOOLS_FOLDER/sbt
+SBT_SHA_FILE="$JTOOLS_FOLDER/sbt_current_sha"
 
 install_sbt() {
 	echo "Installing SBT..."
 
-	if [ ! -d $jtools_folder ]; then
-		mkdir -p "$jtools_folder"
-	fi
+	create_jtools_folders_if_necessary
 
-	if [ -e $full_install_path ]; then
-		echo "SBT already installed or install folder $full_install_path already exists, exiting."
+	if [ -e $SBT_INSTALL_PATH ]; then
+		echo "SBT already installed or install folder $SBT_INSTALL_PATH already exists, exiting."
 		exit 1
 	fi
 
-	git clone git@github.com:paulp/sbt-extras $full_install_path 2>/dev/null
+	git clone git@github.com:paulp/sbt-extras $SBT_INSTALL_PATH 2>/dev/null
 
 	update_current_sha_file
 
-	echo "SBT successfully installed to $full_install_path"
-	if [ "$symlink_to_parent" = "true" ]; then
-		echo "Symlinking $full_install_path/sbt to $base_install_path/sbt..."
-		ln -s $full_install_path/sbt $base_install_path/sbt
-	fi
+	create_path_file "sbt" "$SBT_INSTALL_PATH"
+
+	echo "SBT successfully installed to $SBT_INSTALL_PATH"
 }
 
 update_sbt() {
 	echo "Upgrading SBT..."
 	
-	git -C $full_install_path pull 1>/dev/null
+	git -C $SBT_INSTALL_PATH pull 1>/dev/null
 
-	last_sha=$(cat $sbt_current_sha_file)
+	last_sha=$(cat $SBT_SHA_FILE)
 
-	last_commits=$(git -C $full_install_path --no-pager log --oneline $last_sha..HEAD)
+	last_commits=$(git -C $SBT_INSTALL_PATH --no-pager log --oneline $last_sha..HEAD)
 	if [ "$last_commits" == "" ]; then
 		message="None"
 	else
@@ -63,27 +58,15 @@ remove_sbt() {
 	result=$(yes_or_no "Are you sure you want to remove SBT ? [y/n] ")
 	case "$result" in
 		yes)
-			rm -Rf $full_install_path
-			echo "SBT successfully removed."
-			if [ "$symlink_to_parent" = "true" ]; then
-				rm $base_install_path/sbt
-				echo "Symlink successfully removed."
-			fi
-			;;
+			rm -Rf $SBT_INSTALL_PATH
+			remove_path_file "sbt"
+			echo "SBT successfully removed.";;
 		*) ;;
 	esac
 }
 
-yes_or_no() {
-	read -p "$1" choice
-	case "$choice" in
-		y|Y) echo "yes";;
-	  *) echo "no";;
-	esac
-}
-
 update_current_sha_file() {
-	git -C $full_install_path rev-parse HEAD > $sbt_current_sha_file
+	git -C $SBT_INSTALL_PATH rev-parse HEAD > $SBT_SHA_FILE
 }
 
 case "$1" in
