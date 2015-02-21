@@ -60,6 +60,7 @@ remove_sbt() {
 		yes)
 			rm -Rf $SBT_INSTALL_PATH
 			remove_path_file "sbt"
+			rm "$SBT_SHA_FILE"
 			echo "SBT successfully removed.";;
 		*) ;;
 	esac
