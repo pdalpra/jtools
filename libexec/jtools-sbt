@@ -24,7 +24,7 @@ install_sbt() {
 		exit 1
 	fi
 
-	git clone git@github.com:paulp/sbt-extras $SBT_INSTALL_PATH 2>/dev/null
+	git clone https://github.com/paulp/sbt-extras.git $SBT_INSTALL_PATH 2>/dev/null
 
 	update_current_sha_file
 
