@@ -28,7 +28,7 @@ install_sbt() {
 
 	update_current_sha_file
 
-	create_path_file "sbt" "$SBT_INSTALL_PATH"
+	create_symlink "$SBT_INSTALL_PATH/sbt" "sbt"
 
 	echo "SBT successfully installed to $SBT_INSTALL_PATH"
 }
@@ -59,7 +59,7 @@ remove_sbt() {
 	case "$result" in
 		yes)
 			rm -Rf $SBT_INSTALL_PATH
-			remove_path_file "sbt"
+			remove_symlink "sbt"
 			rm "$SBT_SHA_FILE"
 			echo "SBT successfully removed.";;
 		*) ;;
