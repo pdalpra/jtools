@@ -5,5 +5,5 @@ set -e
 . $_JTOOLS_ROOT/libexec/commons
 
 if [ "$1" != "--complete" ]; then
-	cat $JTOOLS_PATHS_FOLDER/* | paste -s -d ":" -
+	echo $JTOOLS_BINS_FOLDER
 fi
