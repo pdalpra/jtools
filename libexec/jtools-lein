@@ -1,0 +1,53 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Provide jtools completions
+if [ "$1" == "--complete" ]; then
+	echo install
+	echo update
+	echo remove
+fi
+
+. $_JTOOLS_ROOT/libexec/commons
+. $_JTOOLS_ROOT/libexec/git-tools
+
+LEIN_INSTALL_PATH=$JTOOLS_FOLDER/lein
+LEIN_SHA_FILE="$JTOOLS_FOLDER/lein_current_sha"
+
+install_lein() {
+	clone_repo "Leiningen" $LEIN_INSTALL_PATH $LEIN_SHA_FILE "https://github.com/technomancy/leiningen.git" "stable"
+	remove_version_file
+	create_symlink "$LEIN_INSTALL_PATH/bin/lein" "lein"
+}
+
+update_lein() {
+	update_git_repo "Leiningen" $LEIN_INSTALL_PATH $LEIN_SHA_FILE
+	remove_version_file
+}
+
+remove_lein() {
+	result=$(yes_or_no "Are you sure you want to remove Leiningen ? [y/n] ")
+	case "$result" in
+		yes)
+			rm -Rf $LEIN_INSTALL_PATH
+			remove_symlink "lein"
+			rm "$LEIN_SHA_FILE"
+			echo "Leiningen successfully removed.";;
+		*) ;;
+	esac
+}
+
+# Trick lein into thinking it's not running from a source checkout
+remove_version_file() {
+	rm -f "$LEIN_INSTALL_PATH/src/leiningen/version.clj"
+}
+
+case "$1" in
+	install)
+		install_lein;;
+	remove)
+		remove_lein;;
+	update)
+		update_lein;;
+esac
