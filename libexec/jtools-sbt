@@ -16,7 +16,7 @@ SBT_INSTALL_PATH=$JTOOLS_FOLDER/sbt
 SBT_SHA_FILE="$JTOOLS_FOLDER/sbt_current_sha"
 
 install_sbt() {
-	clone_repo "SBT" $SBT_INSTALL_PATH "https://github.com/paulp/sbt-extras.git" $SBT_SHA_FILE
+	clone_repo "SBT" $SBT_INSTALL_PATH $SBT_SHA_FILE "https://github.com/paulp/sbt-extras.git"
 	create_symlink "$SBT_INSTALL_PATH/sbt" "sbt"
 }
 

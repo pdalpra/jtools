@@ -3,8 +3,9 @@
 clone_repo() {
 	name="$1"
 	install_path="$2"
-	url="$3"
-	sha_file="$4"
+	sha_file="$3"
+	url="$4"
+	branch="$5"
 
 	echo "Installing $name..."
 
@@ -15,7 +16,11 @@ clone_repo() {
 		exit 1
 	fi
 
-	git clone $url $install_path 2>/dev/null
+	if [ -n "$branch" ]; then
+		git clone -b $branch $url $install_path 2>/dev/null
+	else
+		git clone $url $install_path 2>/dev/null
+	fi
 	
 	update_current_sha_file $install_path $sha_file 
 	
