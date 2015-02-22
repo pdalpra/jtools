@@ -1,0 +1,54 @@
+#!/usr/bin/env bash
+
+clone_repo() {
+	name="$1"
+	install_path="$2"
+	url="$3"
+	sha_file="$4"
+
+	echo "Installing $name..."
+
+	create_jtools_folders_if_necessary
+
+	if [ -e $install_path ]; then
+		echo "$name already installed or install folder $install_path already exists, exiting."
+		exit 1
+	fi
+
+	git clone $url $install_path 2>/dev/null
+	
+	update_current_sha_file $install_path $sha_file 
+	
+	echo "$name successfully installed to $install_path"
+}
+
+update_git_repo() {
+	name="$1"
+	install_path="$2"
+	sha_file="$3"
+
+	echo "Upgrading $name..."
+	
+	git -C $install_path pull 1>/dev/null
+
+	last_sha=$(cat $sha_file)
+
+	last_commits=$(git -C $install_path --no-pager log --oneline $last_sha..HEAD)
+	if [ "$last_commits" == "" ]; then
+		message="None"
+	else
+		message=$(echo -e "\n$last_commits")
+	fi
+
+	echo "commits since last update: $message"
+
+	update_current_sha_file $install_path $sha_file
+
+	echo -e "\n$name successfully updated."
+}
+
+update_current_sha_file() {
+	install_path="$1"
+	sha_file="$2"
+	git -C $install_path rev-parse HEAD > $sha_file
+}
