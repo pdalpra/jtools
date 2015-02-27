@@ -38,3 +38,41 @@ remove_symlink() {
 	program="$1"
 	rm -f "$JTOOLS_BINS_FOLDER/$program"
 }
+
+select_dl_tool() {
+	if hash wget 2>/dev/null; then
+		# wget exists
+		echo "wget -q -O-"
+	else 
+		if hash curl 2>/dev/null; then
+			# curl exists
+			echo "curl"
+		else
+			if hash http 2>/dev/null; then
+				# httpie exists
+				echo "http GET"
+			else
+				echo "Could not find either wget, curl or httpie, exiting."
+				exit 1
+			fi
+		fi
+	fi
+}
+
+extract_links() {
+	url="$1"
+	dl_tool=$(select_dl_tool)
+	$dl_tool $url | awk 'BEGIN{
+RS="</a>"
+IGNORECASE=1
+}
+{
+  for(o=1;o<=NF;o++){
+    if ( $o ~ /href/){
+      gsub(/.*href=\042/,"",$o)
+      gsub(/\042.*/,"",$o)
+      print $(o)
+    }
+  }
+}'
+}

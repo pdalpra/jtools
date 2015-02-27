@@ -1,0 +1,114 @@
+#!/usr/bin/env bash
+
+set -e
+
+if [ "$1" == "complete" ]; then
+	echo home
+	echo install
+	echo update
+	echo remove
+fi
+
+. $_JTOOLS_ROOT/libexec/commons
+
+MAVEN_INSTALL_PATH=$JTOOLS_FOLDER/maven
+MAVEN_CURRENT_VERSION_FILE="$JTOOLS_FOLDER/maven_current_version"
+MAVEN_DL_URL=${MAVEN_DL_URL:="http://www.us.apache.org/dist/maven/maven-3/"}
+
+__get_latest_maven_version() {
+	links=$(extract_links $MAVEN_DL_URL)
+	
+	# Extract versions from then download page
+	all_versions=""
+	for link in $links; do
+		cleaned="${link::-1}"
+		# Check that the link match a version pattern
+		if [[ "$cleaned" == +([[:digit:]]).+([[:digit:]]).+([[:digit:]]) ]]; then
+			all_versions="$all_versions""$cleaned"$'\n'
+		fi
+	done
+	
+	# Get the latest version
+	latest_version=$(echo "$all_versions" | sort -n | tail -1)
+	
+	echo "$latest_version"
+}
+
+__download_and_install_maven() {
+	version="$1"
+
+	# Download Maven
+  download_url="$MAVEN_DL_URL$version/binaries/apache-maven-$version-bin.tar.gz"
+	dl_tool=$(select_dl_tool)
+	dl_file=$TMPDIR/maven-$version.tar.gz
+	$dl_tool $download_url > "$dl_file"
+	
+	# Prepare extraction and extract
+	mkdir -p "$MAVEN_INSTALL_PATH"
+	tar --strip-components=1 -xpzf $dl_file -C "$MAVEN_INSTALL_PATH"
+}
+
+__update_current_version_file() {
+	version="$1"
+	echo "$version" > "$MAVEN_CURRENT_VERSION_FILE"
+}
+
+m2_home() {
+	echo "$MAVEN_INSTALL_PATH"
+}
+
+install_maven() {
+	check_folder_not_exists "Maven" "$MAVEN_INSTALL_PATH"
+
+	echo "Looking for latest Maven version..."
+	latest_version=$(__get_latest_maven_version)
+	echo "Latest version : $latest_version"
+
+	__download_and_install_maven "$latest_version"
+
+	create_symlink "$MAVEN_INSTALL_PATH/bin/mvn" "mvn"
+	__update_current_version_file "$latest_version"
+
+	echo "Maven successfully installed to $MAVEN_INSTALL_PATH"
+}
+
+update_maven() {
+	current_version=$(cat $MAVEN_CURRENT_VERSION_FILE)
+	echo "Current Maven version: $current_version"
+
+	echo "Looking for newer Maven version..."
+
+	latest_version=$(__get_latest_maven_version)
+
+	newer_version=$(echo "$current_version"$'\n'"$latest_version" | sort -n | tail -1)
+	if [[ "$newer_version" == "$current_version" ]]; then
+		echo "You already have the latest version. Skipping update."
+	else
+		echo "Newer version $newer_version found. Updating..."
+		__download_and_install_maven "$newer_version"
+		__update_current_version_file "$newer_version"
+		echo "Maven successfully updated to version $newer_version."
+	fi
+}
+
+remove_maven() {
+	result=$(yes_or_no "Are you sure you want yo remove Maven ? [y/n] ")
+	case "$result" in
+		yes)
+			rm -Rf $MAVEN_INSTALL_PATH
+			remove_symlink "mvn"
+			echo "Maven successfully removed.";;
+		$) ;;
+	esac
+}
+
+case "$1" in
+	home)
+		m2_home;;
+	install)
+		install_maven;;
+	update)
+		update_maven;;
+	remove)
+		remove_maven;;
+esac
