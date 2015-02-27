@@ -11,6 +11,15 @@ create_jtools_folders_if_necessary() {
 	fi
 }
 
+check_folder_not_exists() {
+	name="$1"
+	path="$2"
+	if [ -e $path ]; then
+		echo "$name already installed or install folder $path already exists, exiting."
+		exit 1
+	fi
+}
+
 yes_or_no() {
 	read -p "$1" choice
 	case "$choice" in

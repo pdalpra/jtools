@@ -1,5 +1,9 @@
 #!/usr/bin/env bash
 
+set -e
+
+. $_JTOOLS_ROOT/libexec/commons
+
 clone_repo() {
 	name="$1"
 	install_path="$2"
@@ -11,10 +15,7 @@ clone_repo() {
 
 	create_jtools_folders_if_necessary
 
-	if [ -e $install_path ]; then
-		echo "$name already installed or install folder $install_path already exists, exiting."
-		exit 1
-	fi
+	check_folder_not_exists $name $install_path
 
 	if [ -n "$branch" ]; then
 		git clone -b $branch $url $install_path 2>/dev/null
