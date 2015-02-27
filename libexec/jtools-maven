@@ -2,7 +2,8 @@
 
 set -e
 
-if [ "$1" == "complete" ]; then
+# Provide jtools completions
+if [ "$1" == "--complete" ]; then
 	echo home
 	echo install
 	echo update
