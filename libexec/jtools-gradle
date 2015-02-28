@@ -1,0 +1,108 @@
+#!/usr/bin/env bash
+
+set -e
+
+# Provide jtools completions
+if [ "$1" == "--complete" ]; then
+	echo install
+	echo update
+	echo remove
+fi
+
+. $_JTOOLS_ROOT/libexec/commons
+
+GRADLE_INSTALL_PATH=$JTOOLS_FOLDER/gradle
+GRADLE_CURRENT_VERSION_FILE="$JTOOLS_FOLDER/gradle_current_version"
+GRADLE_DL_URL="https://services.gradle.org/distributions/"
+
+__get_latest_gradle_version() {
+		links=$(extract_links $GRADLE_DL_URL)
+
+	# Extract releases binaries links from download page
+	all_release_bins=""
+	for link in $links; do
+		if [[ "$link" == !(*\-rc\-*)\-bin\.zip ]]; then
+			all_release_bins="$all_release_bins""$link"$'\n'
+		fi
+	done
+
+	# Sort links to get the latest one, then extract only the version number
+	latest_version_link=$(echo "$all_release_bins" | sort -n | tail -1)
+	latest_version=$(echo "$latest_version_link" | grep -o -E "[[:digit:]]+\.[[:digit:]]+(\.([[:digit:]])+)?")
+
+	echo "$latest_version"
+}
+
+__download_and_install_gradle() {
+	version="$1"
+
+	# Download Maven
+  download_url="$GRADLE_DL_URL""gradle-$version-bin.zip"
+	dl_tool=$(select_dl_tool)
+	dl_file=$TMPDIR/gradle-$version.zip
+	$dl_tool $download_url > "$dl_file"
+
+	# Extract
+	unzip -qq "$dl_file" -d "$TMPDIR"
+	mv "$TMPDIR/gradle-$version" "$GRADLE_INSTALL_PATH"
+}
+
+__update_current_version_file() {
+	version="$1"
+	echo "$version" > "$GRADLE_CURRENT_VERSION_FILE"
+}
+
+install_gradle() {
+	check_folder_not_exists "Gradle" "$GRADLE_INSTALL_PATH"
+
+	echo "Looking for latest Gradle version..."
+	latest_version=$(__get_latest_gradle_version)
+	echo "Latest version : $latest_version"
+
+	__download_and_install_gradle "$latest_version"
+
+	create_symlink "$GRADLE_INSTALL_PATH/bin/gradle" "gradle"
+	__update_current_version_file "$latest_version"
+
+	echo "Gradle successfully installed to $GRADLE_INSTALL_PATH"
+}
+
+update_gradle() {
+	current_version=$(cat $GRADLE_CURRENT_VERSION_FILE)
+	echo "Current Gradle version: $current_version"
+
+	echo "Looking for newer Gradle version..."
+
+	latest_version=$(__get_latest_gradle_version)
+
+	newer_version=$(echo "$current_version"$'\n'"$latest_version" | sort -n | tail -1)
+	if [[ "$newer_version" == "$current_version" ]]; then
+		echo "You already have the latest version. Skipping update."
+	else
+		echo "Newer version $newer_version found. Updating..."
+		rm -R "$GRADLE_INSTALL_PATH"
+		__download_and_install_gradle "$newer_version"
+		__update_current_version_file "$newer_version"
+		echo "Gradle successfully updated to version $newer_version."
+	fi
+}
+
+remove_gradle() {
+	result=$(yes_or_no "Are you sure you want yo remove Gradle ? [y/n] ")
+	case "$result" in
+		yes)
+			rm -Rf $GRADLE_INSTALL_PATH
+			remove_symlink "gradle"
+			echo "Gradle successfully removed.";;
+		$) ;;
+	esac
+}
+
+case "$1" in
+	install)
+		install_gradle;;
+	update)
+		update_gradle;;
+	remove)
+		remove_gradle;;
+esac
