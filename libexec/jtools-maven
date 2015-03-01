@@ -1,4 +1,23 @@
 #!/usr/bin/env bash
+# Usage: jtools maven
+# Summary: Manage your Maven installation
+# Help: This command, along with its subcommands, allows you to install, update or remove Maven.
+# 
+# jtools downloads Maven directly from apache servers or mirrors (configurble through $MAVEN_DL_URL, defaults to http://www.us.apache.org/dist/maven/maven-3/).
+# Everything is stored in $JTOOLS_FOLDER (configurable, defaulting to ~/.jtools)
+#
+# jtools target Maven 3 by default, though targeting Maven 2 requires only to use a $MAVEN_DL_URL 
+# pointing to a Maven 2 download page.
+#
+# 'jtools maven install' :
+#   - Downloads and install the latest Maven version from $MAVEN_DL_URL
+#   - creates a symlink into $JTOOLS_FOLDER/bins (this path is exposed through 'jtools path')
+# 
+# 'jtools maven update' looks for a newer Maven version and installs it if necessary.
+#
+# 'jtools maven remove' removes both the installation folder and the symlink.
+#
+# 'jtools maven home' exposes Maven installation path, allowing an easy setup of the M2_HOME environment variable.
 
 set -e
 
@@ -71,6 +90,9 @@ install_maven() {
 	__update_current_version_file "$latest_version"
 
 	echo "Maven successfully installed to $MAVEN_INSTALL_PATH"
+
+	echo -e "\nIf you want to set the M2_HOME environment variable, simply add to your shell's startup file:"
+	echo -e "   export M2_HOME=\$(jtools maven home)"
 }
 
 update_maven() {

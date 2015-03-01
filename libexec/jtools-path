@@ -1,4 +1,10 @@
 #!/usr/bin/env bash
+# Usage: jtools path
+# Summary: Exposes your installed tools' symlinks folder, to add to your PATH
+# Help: This command prints out the path where the symlinks to the installed tools binaries are located.
+#
+# This way, adding your installed tools to your paths is as simple as that:
+#   export PATH=$PATH:$(jtools path)
 
 set -e
 

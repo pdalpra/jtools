@@ -1,4 +1,18 @@
 #!/usr/bin/env bash
+# Usage: jtools lein
+# Summary: Manage your Leiningen installation
+# Help: This command, along with its subcommands, allows you to install, update or remove Leiningen.
+# 
+# jtools relies on Leiningen source repository, located at https://github.com/technomancy/leiningen.
+# Everything is stored in $JTOOLS_FOLDER (configurable, defaulting to ~/.jtools)
+#
+# 'jtools lein install' :
+#   - clones that repository into $JTOOLS_FOLDER/lein
+#   - creates a symlink into $JTOOLS_FOLDER/bins (this path is exposed through 'jtools path')
+# 
+# 'jtools lein update' simply runs a git pull to update the repository.
+#
+# 'jtools lein remove' removes both the installation folder and the symlink.
 
 set -e
 
