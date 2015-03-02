@@ -1,0 +1,166 @@
+<!doctype html>
+<html>
+  <head>
+    <meta charset="utf-8">
+    <meta http-equiv="X-UA-Compatible" content="chrome=1">
+    <title>jtools by pdalpra</title>
+
+    <link rel="stylesheet" href="stylesheets/styles.css">
+    <link rel="stylesheet" href="stylesheets/pygment_trac.css">
+    <meta name="viewport" content="width=device-width, initial-scale=1, user-scalable=no">
+    <!--[if lt IE 9]>
+    <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+  </head>
+  <body>
+    <div class="wrapper">
+      <header>
+        <h1>jtools</h1>
+        <p>Manage your JVM-based tools with ease !</p>
+
+        <p class="view"><a href="https://github.com/pdalpra/jtools">View the Project on GitHub <small>pdalpra/jtools</small></a></p>
+
+
+        <ul>
+          <li><a href="https://github.com/pdalpra/jtools/zipball/master">Download <strong>ZIP File</strong></a></li>
+          <li><a href="https://github.com/pdalpra/jtools/tarball/master">Download <strong>TAR Ball</strong></a></li>
+          <li><a href="https://github.com/pdalpra/jtools">View On <strong>GitHub</strong></a></li>
+        </ul>
+      </header>
+      <section>
+        <h2>
+<a id="what-is-jtools-" class="anchor" href="#what-is-jtools-" aria-hidden="true"><span class="octicon octicon-link"></span></a>What is jtools ?</h2>
+
+<p>jtools is a set of scripts, available as a single command, to easily manage your favorite JVM-based tools:
+Currently targeted at build tools, it support installation/upgrade/removal of :</p>
+
+<ul>
+<li>Maven</li>
+<li>SBT</li>
+<li>Gradle</li>
+<li>Leiningen</li>
+</ul>
+
+<p>However, feel free to suggest support for additional tools on <a href="https://github.com/pdalpra/jtools/issues">jtools's issue tracker</a> !</p>
+
+<h2>
+<a id="why-use-jtools-when-i-can-use-a-package-manager-" class="anchor" href="#why-use-jtools-when-i-can-use-a-package-manager-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Why use jtools when I can use a package manager ?</h2>
+
+<p>This is indeed a reasonable question.</p>
+
+<p>You could very well use any package manager available for your OS.
+However, using a package manager has two huge flaws :</p>
+
+<ul>
+<li>They are <em>so many</em> package managers, sometimes several per OS/distro, each using their own packaging format. It it hard to manage several computers with possibly different OSes in the same fashions as tools differs.</li>
+<li>They depend on the good will of maintainers that will bundle new versions for each package manager</li>
+</ul>
+
+<p>jtools hope to solve these issues (for JVM-based tools at least) by: </p>
+
+<ul>
+<li>Relying only on bash scripts, with as few external dependencies as possible. ATM, only either wget/curl/httpie and Git are required, which are quite common tools for a developer :)</li>
+<li>Installing directly from upstreams source, either through Git or by installing from the official distributions</li>
+</ul>
+
+<h2>
+<a id="setup" class="anchor" href="#setup" aria-hidden="true"><span class="octicon octicon-link"></span></a>Setup</h2>
+
+<p>Clone jtools :</p>
+
+<pre><code>git clone https://github.com/pdalpra/jtools.git ~/.bin/jtools
+</code></pre>
+
+<p>Then, in your <code>.bashrc</code>/<code>.zshrc</code>/your shell's startup file, add:</p>
+
+<pre><code>export PATH=$PATH:~/.bin/jtools/bin
+eval $(jtools init -)
+export PATH=$PATH:$(jtools path)
+</code></pre>
+
+<h2>
+<a id="usage" class="anchor" href="#usage" aria-hidden="true"><span class="octicon octicon-link"></span></a>Usage</h2>
+
+<h3>
+<a id="structure" class="anchor" href="#structure" aria-hidden="true"><span class="octicon octicon-link"></span></a>Structure</h3>
+
+<p>jtools exposes several subcommands, one for each supported tool :</p>
+
+<ul>
+<li><code>jtools maven</code></li>
+<li><code>jtools gradle</code></li>
+<li><code>jtools sbt</code></li>
+<li><code>jtools lein</code></li>
+</ul>
+
+<p>In turn, each of those subcommands expose three subcommands :</p>
+
+<ul>
+<li><code>install</code></li>
+<li><code>update</code></li>
+<li><code>remove</code></li>
+</ul>
+
+<p>This subcommands allows you to either install, update or remove the selected tool.</p>
+
+<h3>
+<a id="examples" class="anchor" href="#examples" aria-hidden="true"><span class="octicon octicon-link"></span></a>Examples</h3>
+
+<p>To install all four tools, type :</p>
+
+<pre><code>$ jtools maven install
+$ jtools gradle install
+$ jtools sbt install
+$ jtools lein install 
+</code></pre>
+
+<p><code>update</code> and <code>remove</code> works in the same way as <code>install</code>:</p>
+
+<pre><code>$ jtools maven upgrade
+$ jtools gradle upgrade
+$ jtools sbt upgrade
+$ jtools lein upgrade 
+</code></pre>
+
+<h3>
+<a id="jtools-maven-home" class="anchor" href="#jtools-maven-home" aria-hidden="true"><span class="octicon octicon-link"></span></a><code>jtools maven home</code>
+</h3>
+
+<p><code>jtools maven</code> also offers and an additional subcommand, <code>home</code>, to easily export Maven's install path to the <code>M2_HOME</code> environment variable:</p>
+
+<pre><code>export M2_HOME=$(jtools maven home)
+</code></pre>
+
+<h2>
+<a id="contributing" class="anchor" href="#contributing" aria-hidden="true"><span class="octicon octicon-link"></span></a>Contributing</h2>
+
+<h3>
+<a id="license" class="anchor" href="#license" aria-hidden="true"><span class="octicon octicon-link"></span></a>License</h3>
+
+<p>jtools is licensed under the MIT license. Pull requests are welcome :)
+The source codes lives in <a href="https://github.com/pdalpra/jtools">https://github.com/pdalpra/jtools</a></p>
+
+<h3>
+<a id="issues--feature-requests-" class="anchor" href="#issues--feature-requests-" aria-hidden="true"><span class="octicon octicon-link"></span></a>Issues ? Feature requests ?</h3>
+
+<p>Feel free to report any bug or reques additional tools supports or enhancements on <a href="https://github.com/pdalpra/jtools/issues">jtools issue tracker</a> !</p>
+      </section>
+      <footer>
+        <p>This project is maintained by <a href="https://github.com/pdalpra">pdalpra</a></p>
+        <p><small>Hosted on GitHub Pages &mdash; Theme by <a href="https://github.com/orderedlist">orderedlist</a></small></p>
+      </footer>
+    </div>
+    <script src="javascripts/scale.fix.js"></script>
+              <script type="text/javascript">
+            var gaJsHost = (("https:" == document.location.protocol) ? "https://ssl." : "http://www.");
+            document.write(unescape("%3Cscript src='" + gaJsHost + "google-analytics.com/ga.js' type='text/javascript'%3E%3C/script%3E"));
+          </script>
+          <script type="text/javascript">
+            try {
+              var pageTracker = _gat._getTracker("UA-60289205-1");
+            pageTracker._trackPageview();
+            } catch(err) {}
+          </script>
+
+  </body>
+</html>
