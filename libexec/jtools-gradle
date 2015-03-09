@@ -119,4 +119,6 @@ case "$1" in
 		update_gradle;;
 	remove)
 		remove_gradle;;
+	*)
+		jtools help gradle;;
 esac

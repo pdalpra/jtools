@@ -64,4 +64,6 @@ case "$1" in
 		remove_lein;;
 	update)
 		update_lein;;
+	*)
+		jtools help lein;;
 esac

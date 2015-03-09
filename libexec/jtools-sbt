@@ -58,5 +58,7 @@ case "$1" in
 		remove_sbt;;
 	update)
 		update_sbt;;
+	*)
+		jtools help sbt;;
 esac
 

@@ -134,4 +134,6 @@ case "$1" in
 		update_maven;;
 	remove)
 		remove_maven;;
+	*)
+		jtools help maven;;
 esac
