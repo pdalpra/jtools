@@ -84,7 +84,7 @@ $ jtools lein upgrade
 `jtools maven` also offers and an additional subcommand, `home`, to easily export Maven's install path to the `M2_HOME` environment variable:
 
 ```
-export M2_HOME=$(jtools maven home)
+eval "$(jtools maven home)"
 ```
 
 ## Contributing

@@ -74,7 +74,7 @@ __update_current_version_file() {
 }
 
 m2_home() {
-	echo "$MAVEN_INSTALL_PATH"
+	echo "export M2_HOME=$MAVEN_INSTALL_PATH"
 }
 
 install_maven() {
