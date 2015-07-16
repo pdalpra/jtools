@@ -2,17 +2,17 @@
 # Usage: jtools maven
 # Summary: Manage your Maven installation
 # Help: This command, along with its subcommands, allows you to install, update or remove Maven.
-# 
+#
 # jtools downloads Maven directly from apache servers or mirrors (configurble through $MAVEN_DL_URL, defaults to http://www.us.apache.org/dist/maven/maven-3/).
 # Everything is stored in $JTOOLS_FOLDER (configurable, defaulting to ~/.jtools)
 #
-# jtools target Maven 3 by default, though targeting Maven 2 requires only to use a $MAVEN_DL_URL 
+# jtools target Maven 3 by default, though targeting Maven 2 requires only to use a $MAVEN_DL_URL
 # pointing to a Maven 2 download page.
 #
 # 'jtools maven install' :
 #   - Downloads and install the latest Maven version from $MAVEN_DL_URL
 #   - creates a symlink into $JTOOLS_FOLDER/bins (this path is exposed through 'jtools path')
-# 
+#
 # 'jtools maven update' looks for a newer Maven version and installs it if necessary.
 #
 # 'jtools maven remove' removes both the installation folder and the symlink.
@@ -27,6 +27,7 @@ if [ "$1" == "--complete" ]; then
 	echo install
 	echo update
 	echo remove
+	exit
 fi
 
 . $_JTOOLS_ROOT/libexec/commons
@@ -37,7 +38,7 @@ MAVEN_DL_URL=${MAVEN_DL_URL:="http://www.us.apache.org/dist/maven/maven-3/"}
 
 __get_latest_maven_version() {
 	links=$(extract_links $MAVEN_DL_URL)
-	
+
 	# Extract versions from then download page
 	all_versions=""
 	for link in $links; do
@@ -47,10 +48,10 @@ __get_latest_maven_version() {
 			all_versions="$all_versions""$cleaned"$'\n'
 		fi
 	done
-	
+
 	# Get the latest version
 	latest_version=$(echo "$all_versions" | sort -n | tail -1)
-	
+
 	echo "$latest_version"
 }
 
@@ -62,7 +63,7 @@ __download_and_install_maven() {
 	dl_tool=$(select_dl_tool)
 	dl_file=$TMPDIR/maven-$version.tar.gz
 	$dl_tool $download_url > "$dl_file"
-	
+
 	# Prepare extraction and extract
 	mkdir -p "$MAVEN_INSTALL_PATH"
 	tar --strip-components=1 -xpzf $dl_file -C "$MAVEN_INSTALL_PATH"

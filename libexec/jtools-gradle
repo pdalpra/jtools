@@ -2,14 +2,14 @@
 # Usage: jtools gradle
 # Summary: Manage your Gradle installation
 # Help: This command, along with its subcommands, allows you to install, update or remove Gradle.
-# 
+#
 # jtools downloads Gradle directly from Gradle download servers.
 # Everything is stored in $JTOOLS_FOLDER (configurable, defaulting to ~/.jtools)
 #
 # 'jtools gradle install' :
 #   - Downloads and install the latest Gradle version
 #   - creates a symlink into $JTOOLS_FOLDER/bins (this path is exposed through 'jtools path')
-# 
+#
 # 'jtools gradle update' looks for a newer Gradle version and installs it if necessary.
 #
 # 'jtools gradle remove' removes both the installation folder and the symlink.
@@ -21,6 +21,7 @@ if [ "$1" == "--complete" ]; then
 	echo install
 	echo update
 	echo remove
+	exit
 fi
 
 . $_JTOOLS_ROOT/libexec/commons

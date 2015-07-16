@@ -21,6 +21,7 @@ if [ "$1" == "--complete" ]; then
 	echo install
 	echo update
 	echo remove
+	exit
 fi
 
 . $_JTOOLS_ROOT/libexec/commons

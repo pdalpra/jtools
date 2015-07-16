@@ -2,14 +2,14 @@
 # Usage: jtools sbt
 # Summary: Manage your SBT installation
 # Help: This command, along with its subcommands, allows you to install, update or remove SBT.
-# 
+#
 # jtools uses Paul Philips' script from https://github.com/paulp/sbt-extras.git to run SBT.
 # Everything is stored in $JTOOLS_FOLDER (configurable, defaulting to ~/.jtools)
 #
 # 'jtools sbt install' :
 #   - clones that repository into $JTOOLS_FOLDER/sbt
 #   - creates a symlink into $JTOOLS_FOLDER/bins (this path is exposed through 'jtools path')
-# 
+#
 # 'jtools sbt update' simply runs a git pull to update the repository.
 #
 # 'jtools sbt remove' removes both the installation folder and the symlink.
@@ -21,6 +21,7 @@ if [ "$1" = "--complete" ]; then
 	echo install
 	echo update
 	echo remove
+	exit
 fi
 
 . $_JTOOLS_ROOT/libexec/commons
@@ -52,7 +53,7 @@ remove_sbt() {
 
 
 case "$1" in
-	install) 
+	install)
 		install_sbt;;
 	remove)
 		remove_sbt;;
@@ -61,4 +62,3 @@ case "$1" in
 	*)
 		jtools help sbt;;
 esac
-
